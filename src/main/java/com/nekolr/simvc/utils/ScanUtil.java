@@ -221,7 +221,7 @@ public class ScanUtil {
                                 RequestMapping preRm = clazz.getAnnotation(RequestMapping.class);
                                 preUri = preRm.value();
                             }
-                            Method[] methods = clazz.getMethods();
+                            Method[] methods = clazz.getDeclaredMethods();
                             for (Method method : methods) {
                                 if (method.isAnnotationPresent(RequestMapping.class)) {
                                     RequestMapping nxRm = method.getAnnotation(RequestMapping.class);
