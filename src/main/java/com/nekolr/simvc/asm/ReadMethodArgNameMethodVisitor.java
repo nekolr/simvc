@@ -21,7 +21,8 @@ public class ReadMethodArgNameMethodVisitor extends MethodVisitor {
         if ("this".equals(name)) {
             return;
         }
-        if (argLen-- > 0) {
+
+        if (index <= argLen) {
             argumentNames.add(name);
         }
     }
