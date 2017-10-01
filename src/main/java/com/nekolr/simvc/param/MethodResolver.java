@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -108,24 +109,7 @@ public class MethodResolver {
     private static Object transform(Class<?> type, String[] values) {
         if (type.isArray()) {
             Class<?> clazz = type.getComponentType();
-            Object[] params;
-            if ("java.lang.String".equals(clazz.getName())) {
-                params = new String[values.length];
-            } else if ("java.lang.Integer".equals(clazz.getName()) || "int".equals(clazz.getName())) {
-                params = new Integer[values.length];
-            } else if ("java.lang.Boolean".equals(clazz.getName()) || "boolean".equals(clazz.getName())) {
-                params = new Boolean[values.length];
-            } else if ("java.lang.Double".equals(clazz.getName()) || "double".equals(clazz.getName())) {
-                params = new Double[values.length];
-            } else if ("java.lang.Float".equals(clazz.getName()) || "float".equals(clazz.getName())) {
-                params = new Float[values.length];
-            } else if ("java.lang.Long".equals(clazz.getName()) || "long".equals(clazz.getName())) {
-                params = new Long[values.length];
-            } else if ("java.lang.Short".equals(clazz.getName()) || "short".equals(clazz.getName())) {
-                params = new Short[values.length];
-            } else {
-                params = new Object[values.length];
-            }
+            Object[] params = (Object[]) Array.newInstance(clazz, values.length);
             for (int i = 0; i < values.length; i++) {
                 params[i] = typeTransform(clazz, values[i]);
             }
