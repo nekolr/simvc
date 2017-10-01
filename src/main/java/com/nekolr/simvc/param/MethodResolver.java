@@ -53,7 +53,7 @@ public class MethodResolver {
      * @return
      */
     private static String getClassFileName(String className) {
-        String formatName = className.replaceAll("\\.", "\\/")+".class";
+        String formatName = className.replaceAll("\\.", "\\/") + ".class";
         ClassLoader cl = ScanUtil.getDefaultClassLoader();
         Enumeration resourceUrls = null;
         try {
@@ -88,18 +88,71 @@ public class MethodResolver {
                     String paramName = paramList.get(i);
                     for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
                         if (paramName.equals(entry.getKey())) {
-                            String []values = entry.getValue();
-                            if(values.length > 1) {
-
-                            } else {
-                                invokeParams[i] = values[0];
-                            }
+                            String[] values = entry.getValue();
+                            invokeParams[i] = transform(type, values);
                         }
-                        //TODO:缺失参数处理
                     }
                 }
             }
         }
         return invokeParams;
+    }
+
+    /**
+     * 类型转换
+     *
+     * @param type
+     * @param values
+     * @return
+     */
+    private static Object transform(Class<?> type, String[] values) {
+        if (type.isArray()) {
+            Class<?> clazz = type.getComponentType();
+            Object[] params;
+            if ("java.lang.String".equals(clazz.getName())) {
+                params = new String[values.length];
+            } else if ("java.lang.Integer".equals(clazz.getName()) || "int".equals(clazz.getName())) {
+                params = new Integer[values.length];
+            } else if ("java.lang.Boolean".equals(clazz.getName()) || "boolean".equals(clazz.getName())) {
+                params = new Boolean[values.length];
+            } else if ("java.lang.Double".equals(clazz.getName()) || "double".equals(clazz.getName())) {
+                params = new Double[values.length];
+            } else if ("java.lang.Float".equals(clazz.getName()) || "float".equals(clazz.getName())) {
+                params = new Float[values.length];
+            } else if ("java.lang.Long".equals(clazz.getName()) || "long".equals(clazz.getName())) {
+                params = new Long[values.length];
+            } else if ("java.lang.Short".equals(clazz.getName()) || "short".equals(clazz.getName())) {
+                params = new Short[values.length];
+            } else {
+                params = new Object[values.length];
+            }
+            for (int i = 0; i < values.length; i++) {
+                params[i] = typeTransform(clazz, values[i]);
+            }
+            return params;
+        } else {
+            return typeTransform(type, values[0]);
+        }
+    }
+
+
+    private static Object typeTransform(Class<?> type, String value) {
+        String typeName = type.getName();
+        if ("java.lang.String".equals(typeName))
+            return value.toString();
+        else if ("java.lang.Integer".equals(typeName) || "int".equals(typeName))
+            return Integer.valueOf(value);
+        else if ("java.lang.Boolean".equals(typeName) || "boolean".equals(typeName))
+            return Boolean.valueOf(value);
+        else if ("java.lang.Double".equals(typeName) || "double".equals(typeName))
+            return Double.valueOf(value);
+        else if ("java.lang.Float".equals(typeName) || "float".equals(typeName))
+            return Float.valueOf(value);
+        else if ("java.lang.Long".equals(typeName) || "long".equals(typeName))
+            return Long.valueOf(value);
+        else if ("java.lang.Short".equals(typeName) || "short".equals(typeName))
+            return Short.valueOf(value);
+        else
+            return null;
     }
 }
