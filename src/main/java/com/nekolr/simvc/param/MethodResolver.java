@@ -87,8 +87,14 @@ public class MethodResolver {
                 else {
                     String paramName = paramList.get(i);
                     for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
-                        if (paramName.equals(entry.getKey()))
-                            invokeParams[i] = entry.getValue();
+                        if (paramName.equals(entry.getKey())) {
+                            String []values = entry.getValue();
+                            if(values.length > 1) {
+
+                            } else {
+                                invokeParams[i] = values[0];
+                            }
+                        }
                         //TODO:缺失参数处理
                     }
                 }
