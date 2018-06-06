@@ -10,7 +10,7 @@ public class ZtreeController {
 
     @RequestMapping(value = "/index.do", method = RequestMethod.GET)
     public String index(){
-        return "index";
+        return "index.html";
     }
 }
 ```
