@@ -7,9 +7,7 @@ import com.nekolr.simvc.annotation.ResponseBody;
 import com.nekolr.simvc.meta.MetaDataBean;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
@@ -44,57 +42,6 @@ public class ScanUtil {
     }
 
     /**
-     * 获取class类型集合
-     *
-     * @param basePackage
-     * @param isRecursive
-     * @return
-     */
-    public static List<Class<?>> getClassList(String basePackage, boolean isRecursive) {
-        String formatPk = basePackage.replaceAll("\\.", "\\/");
-        List<Class<?>> classList = new ArrayList<>();
-        ClassLoader cl = getDefaultClassLoader();
-        Enumeration resourceUrls = null;
-        try {
-            resourceUrls = cl != null ? cl.getResources(formatPk) : ClassLoader.getSystemResources(formatPk);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        while (resourceUrls.hasMoreElements()) {
-            URL url = (URL) resourceUrls.nextElement();
-            File file = new File(url.getFile());
-            addClasses(classList, file.getAbsolutePath(), basePackage, isRecursive);
-        }
-        return classList;
-    }
-
-    /**
-     * 获取指定注解或注解子类的class类型集合
-     *
-     * @param basePackage
-     * @param isRecursive
-     * @param annotationClass
-     * @return
-     */
-    public static List<Class<?>> getClassListByAnnotation(String basePackage, boolean isRecursive, Class<? extends Annotation> annotationClass) {
-        String formatPk = basePackage.replaceAll("\\.", "\\/");
-        List<Class<?>> classList = new ArrayList<>();
-        ClassLoader cl = getDefaultClassLoader();
-        Enumeration resourceUrls = null;
-        try {
-            resourceUrls = cl != null ? cl.getResources(formatPk) : ClassLoader.getSystemResources(formatPk);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        while (resourceUrls.hasMoreElements()) {
-            URL url = (URL) resourceUrls.nextElement();
-            File file = new File(url.getFile());
-            addClassesByAnnotation(classList, file.getAbsolutePath(), basePackage, isRecursive, annotationClass);
-        }
-        return classList;
-    }
-
-    /**
      * 获取扫描包路径
      *
      * @param basePackage
@@ -118,77 +65,10 @@ public class ScanUtil {
         return packageFiles;
     }
 
-    /**
-     * 将class类型添加到集合
-     *
-     * @param classes
-     * @param packagePath
-     * @param packageName
-     * @param isRecursive
-     */
-    public static void addClasses(List<Class<?>> classes, String packagePath, String packageName, boolean isRecursive) {
-        File[] files = getClassFiles(packagePath);
-        if (files != null) {
-            for (int i = 0, len = files.length; i < len; i++) {
-                String fileName = files[i].getName();
-                if (files[i].isFile()) {
-                    String className = getClassName(packageName, fileName);
-                    try {
-                        classes.add(Class.forName(className));
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    if (isRecursive) {
-                        String subPackagePath = getSubPackagePath(packagePath, fileName);
-                        String subPackageName = getSubPackageName(packageName, fileName);
-                        addClasses(classes, subPackagePath, subPackageName, isRecursive);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 将含有指定注解或注解的子类的class添加到集合
-     *
-     * @param classes
-     * @param packagePath
-     * @param packageName
-     * @param isRecursive
-     * @param annotationClass
-     */
-    public static void addClassesByAnnotation(List<Class<?>> classes, String packagePath, String packageName,
-                                              boolean isRecursive, Class<? extends Annotation> annotationClass) {
-        File[] files = getClassFiles(packagePath);
-        if (files != null) {
-            for (int i = 0, len = files.length; i < len; i++) {
-                String fileName = files[i].getName();
-                if (files[i].isFile()) {
-                    String className = getClassName(packageName, fileName);
-                    try {
-                        Class<?> clazz = Class.forName(className);
-                        if (clazz.isAnnotationPresent(annotationClass)) {
-                            classes.add(clazz);
-                        }
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    if (isRecursive) {
-                        String subPackagePath = getSubPackagePath(packagePath, fileName);
-                        String subPackageName = getSubPackageName(packageName, fileName);
-                        addClassesByAnnotation(classes, subPackagePath, subPackageName, isRecursive, annotationClass);
-                    }
-                }
-            }
-        }
-    }
-
 
     public static Map<String, MetaDataBean> getMetaMap(String basePackage, boolean isRecursive) {
         Map<String, MetaDataBean> map = new HashMap<>();
-        if(basePackage!=null){
+        if (basePackage != null) {
             List<File> files = getPackageFiles(basePackage);
             for (File file : files) {
                 getMetaDataBeanMap(file.getAbsolutePath(), basePackage, isRecursive, map);
@@ -249,30 +129,6 @@ public class ScanUtil {
         }
     }
 
-    /**
-     * 获取方法集合
-     *
-     * @param clazz
-     * @param annotationClass
-     * @return
-     */
-    public static List<Method> getMethodListByAnnotation(Class<?> clazz, Class<? extends Annotation> annotationClass) {
-        List<Method> list = new ArrayList<>();
-        if (clazz != null) {
-            Method[] methods = clazz.getMethods();
-            for (Method method : methods) {
-                Annotation[] annotations = method.getAnnotations();
-                for (Annotation annotation : annotations) {
-                    if (annotation.annotationType() == annotationClass) {
-                        list.add(method);
-                        break;
-                    }
-                }
-            }
-        }
-        return list;
-    }
-
 
     /**
      * 从给定包路径获取class文件
@@ -281,12 +137,7 @@ public class ScanUtil {
      * @return
      */
     private static File[] getClassFiles(String packagePath) {
-        return new File(packagePath).listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return (file.isFile() && file.getName().endsWith(".class")) || file.isDirectory();
-            }
-        });
+        return new File(packagePath).listFiles((file) -> (file.isFile() && file.getName().endsWith(".class")) || file.isDirectory());
     }
 
     /**

@@ -2,26 +2,27 @@ package com.nekolr.simvc.meta;
 
 import com.nekolr.simvc.annotation.RequestMethod;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
  */
-public class MetaDataBean {
+public class MetaDataBean implements Serializable {
 
     private Class<?> clazz;
 
     private Method method;
 
+    private Object instance;
+
     private boolean isAjax;
 
     private String uri;
 
-    private RequestMethod []type;
+    private RequestMethod[] type;
 
-    public MetaDataBean(Class<?> clazz, Method method, String uri, boolean isAjax, RequestMethod []type) {
+    public MetaDataBean(Class<?> clazz, Method method, String uri, boolean isAjax, RequestMethod[] type) {
         this.clazz = clazz;
         this.method = method;
         this.uri = uri;
@@ -47,5 +48,13 @@ public class MetaDataBean {
 
     public RequestMethod[] getType() {
         return type;
+    }
+
+    public Object getInstance() {
+        return instance;
+    }
+
+    public void setInstance(Object instance) {
+        this.instance = instance;
     }
 }

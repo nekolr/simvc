@@ -76,7 +76,11 @@ public class MethodResolver {
      * @param response
      * @return
      */
-    public static Object[] getInvokeParams(List<String> paramList, Class<?>[] paramTypes, Map<String, String[]> parameterMap, HttpServletRequest request, HttpServletResponse response) {
+    public static Object[] getInvokeParams(List<String> paramList,
+                                           Class<?>[] paramTypes,
+                                           Map<String, String[]> parameterMap,
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
         Object[] invokeParams = new Object[paramList.size()];
         if (paramList != null) {
             for (int i = 0, len = paramTypes.length; i < len; i++) {
@@ -123,7 +127,7 @@ public class MethodResolver {
     private static Object typeTransform(Class<?> type, String value) {
         String typeName = type.getName();
         if ("java.lang.String".equals(typeName))
-            return value.toString();
+            return value;
         else if ("java.lang.Integer".equals(typeName) || "int".equals(typeName))
             return Integer.valueOf(value);
         else if ("java.lang.Boolean".equals(typeName) || "boolean".equals(typeName))

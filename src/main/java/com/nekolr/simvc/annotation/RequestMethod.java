@@ -13,5 +13,5 @@ public enum RequestMethod {
     OPTIONS,
     TRACE;
 
-    private RequestMethod(){}
+    RequestMethod(){}
 }
